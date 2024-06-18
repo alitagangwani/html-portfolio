@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lessons Learned</title>
+    <style>
+        body {
+            background: url('C:/Users/agg775172/Downloads/login-form-main/login-form-main/assets/img/login-bg.png') no-repeat center center fixed;
+            background-size: cover; 
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px; 
+            text-align: center;
+            color: #333;
+        }
+        .message {
+            text-align: center;
+        }
+        .upload-section {
+            margin-top: 20px;
+        }
+        .upload-section h2 {
+            margin-bottom: 10px;
+        }
+        .upload-section input[type="file"] {
+            display: none;
+        }
+        .upload-section label {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
+        .file-content {
+            margin-top: 20px;
+            max-height: 500px; 
+            overflow-y: auto;
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+        .file-content pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff4d4d;
+            color: white;
+            padding: 5px 10px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4faf4;
+            color: #000;
+            font-weight: bold;
+        }
+        .file-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .file-list .file-item {
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 8px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="message">
+        <h1>Lessons Learned</h1>
+    </div>
+
+    <div class="upload-section">
+        <h2>Upload your lessons file:</h2>
+        <input type="file" id="fileInput" />
+        <label for="fileInput">Choose File</label>
+    </div>
+
+    <div class="file-content" id="fileContent"> 
+    </div>
+
+    <div class="file-list" id="fileList">
+    </div>
+
+    <button class="save-button" onclick="saveUploadedFiles()"><i class="fa fa-save"></i> Save Lessons</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const fileContent = document.getElementById('fileContent');
+    let uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || {};
+
+    fileInput.addEventListener('change', handleFileUpload);
+
+    function handleFileUpload(event) {
+        const files = event.target.files;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            uploadedFiles[file.name] = file;
+        }
+        updateUploadedFilesList();
+        saveUploadedFiles();
+    }
+
+    function displayFileContent(fileName) {
+        const file = uploadedFiles[fileName];
+        if (!file) {
+            console.error('File not found or is corrupted:', fileName);
+            alert('File not found or is corrupted.');
+            return;
+        }
+
+        const reader = new FileReader();
+        const fileType = file.type;
+
+        reader.onload = function(e) {
+            const content = e.target.result;
+            if (fileType.includes('text')) {
+                displayTextContent(content);
+            } else if (fileType.includes('image')) {
+                displayImageContent(content);
+            } else if (fileType.includes('spreadsheet') || file.name.endsWith('.xlsx')) {
+                displayExcelContent(content);
+            }
+        };
+
+        reader.onerror = function(e) {
+            console.error('Error reading file:', e.target.error);
+            alert('Error reading file.');
+        };
+
+        if (fileType.includes('text') || fileType.includes('image')) {
+            reader.readAsDataURL(file);
+        } else if (fileType.includes('spreadsheet') || file.name.endsWith('.xlsx')) {
+            reader.readAsArrayBuffer(file);
+        }
+    }
+
+    function displayTextContent(content) {
+        const pre = document.createElement('pre');
+        pre.textContent = atob(content.split(',')[1]);
+        fileContent.innerHTML = '';
+        fileContent.appendChild(pre);
+        addDeleteButton();
+    }
+
+    function displayImageContent(content) {
+        const img = document.createElement('img');
+        img.src = content;
+        fileContent.innerHTML = '';
+        fileContent.appendChild(img);
+        addDeleteButton();
+    }
+
+    function displayExcelContent(content) {
+        const data = new Uint8Array(content);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const htmlContent = XLSX.utils.sheet_to_html(worksheet);
+        fileContent.innerHTML = htmlContent;
+        addDeleteButton();
+    }
+
+    function addDeleteButton() {
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete File';
+        deleteButton.className = 'delete-button';
+        deleteButton.onclick = deleteFile;
+        fileContent.appendChild(deleteButton);
+    }
+
+    function deleteFile() {
+        fileContent.innerHTML = '';
+        const fileName = fileContent.dataset.fileName;
+        delete uploadedFiles[fileName];
+        updateUploadedFilesList();
+        saveUploadedFiles();
+    }
+
+    function saveUploadedFiles() {
+        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+        alert('Files saved successfully!');
+    }
+
+    function updateUploadedFilesList() {
+        fileList.innerHTML = '';
+        Object.keys(uploadedFiles).forEach(fileName => {
+            const listItem = document.createElement('div');
+            listItem.textContent = fileName;
+            listItem.className = 'file-item';
+            listItem.onclick = () => displayFileContent(fileName);
+            fileList.appendChild(listItem);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateUploadedFilesList();
+    });
+</script>
+
+</body>
+</html>
