@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Filter Data by Category</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+           background-color: rgb(247, 218, 247);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            max-width: 1200px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+                
+        }
+        table, th, td {
+            border: 1px solid rgb(0, 0, 0);
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>                
+    <h1>Filter Data by Category</h1>
+    <label for="categoryDropdown">Select Category:</label>
+    <select id="categoryDropdown" onchange="filterData()">
+        <option value="All">All</option>
+        
+    </select>
+
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Sl.No</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Problem Solving</th>
+                <th>Contributed By</th>
+                <th>Voted/Seconded By</th>
+                <th>Remarks/Additional Points</th>
+                <th>Added By</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+
+    <script>
+        const data = [
+            { "Sl.No": 1, "Category": "Project/Program Management", "Description": "Lack of Risk Register and Monitoring", "Problem solving": "Training on iPMS (Risk Management )\nTool for ...", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 2, "Category": "Project/Program Management", "Description": "Timely Root Cause Analysis with Preventive and Corrective actions", "Problem solving": "To have RCA training\nTeam Bandwidth issue\nTr...", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 3, "Category": "Project/Program Management", "Description": "Following Waterfall or Agile Methodologies and approach for projects", "Problem solving": null, "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "<Alok>\nPlease add details on what didn't work...", "added by": null, "Priority": "P1" },
+            { "Sl.No": 4, "Category": "Project/Program Management", "Description": "Effective Backlog Management through Scrum Master", "Problem solving": null, "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Akhilesh : Certified Scrum master was not present", "added by": null, "Priority": "P1" },
+            { "Sl.No": 5, "Category": "Project/Program Management", "Description": "Release Management", "Problem solving": "Template for Release Management\nBuild and dep...", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P3" },
+            { "Sl.No": 6, "Category": "Technical", "Description": "Release Notes", "Problem solving": "Template for Release Management\nBuild and dep...", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Additional deployment issue happened", "added by": null, "Priority": "P1" },
+            { "Sl.No": 7, "Category": "Technical", "Description": "High level design finalized with/without all inputs", "Problem solving": "To have RCA training\nTeam Bandwidth issue\nTr...", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 8, "Category": "Customer Handling", "Description": "External customer communication through escalation", "Problem solving": "Customer communication\nExpectation management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 9, "Category": "Project/Program Management", "Description": "Absence of Solution Documentation", "Problem solving": "Customer communication\nExpectation management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P1" },
+            { "Sl.No": 10, "Category": "Project/Program Management", "Description": "Absence of technical customer inputs for development", "Problem solving": "Risk Management\nExpectation Management\nCustom...", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Kiran : Solution Documentation missing", "added by": null, "Priority": "P1" },
+            { "Sl.No": 11, "Category": "Technical", "Description": "Lack of Template/Tool for effort estimation", "Problem solving": "Contract management\nManagement of deliverables...", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 12, "Category": "Project/Program Management", "Description": "Over communication in-terms of various dashboards", "Problem solving": "Project Management Tool/Dashboard", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P3" },
+            { "Sl.No": 13, "Category": "Program Timelines", "Description": "Very Stringent timelines with lots of parallel activities without Delivery consensus", "Problem solving": "Task Management\nTime Management\nResource Mana...", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P1" },
+            { "Sl.No": 14, "Category": "Program Timelines", "Description": "Too many unplanned tasks added in like - Test Case Approval, Content approval, Pre-Req data, E2E Testing etc..", "Problem solving": "Scope Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Akhilesh : Timelines were not revised after ad...", "added by": null, "Priority": "P1" },
+            { "Sl.No": 15, "Category": "Program Timelines", "Description": "End Less Testing and E2E", "Problem solving": "Testing strategy for project", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 16, "Category": "Program Timelines", "Description": "Unplanned Guided Testing cycle followed by customer testing cycle", "Problem solving": "Scope Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 17, "Category": "Program Timelines", "Description": "Agile Methodology for testing & development", "Problem solving": "Scope Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P1" },
+            { "Sl.No": 18, "Category": "Program Timelines", "Description": "Work broken down into smaller tasks", "Problem solving": "Task management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P1" },
+            { "Sl.No": 19, "Category": "Program Timelines", "Description": "We start doing before completing", "Problem solving": "Scope Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P1" },
+            { "Sl.No": 20, "Category": "Program Timelines", "Description": "To develop minimum viable solution (Kiran) and pilot it before full implementation", "Problem solving": "Solution Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 21, "Category": "Program Timelines", "Description": "We deliver on time though we are not prepared", "Problem solving": "Project Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P1" },
+            { "Sl.No": 22, "Category": "Program Timelines", "Description": "Involvement of right SME at right time and keeping them in team till end", "Problem solving": "Resource Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Resources were on-boarded for some purposes, e...", "added by": null, "Priority": "P3" },
+            { "Sl.No": 23, "Category": "Program Timelines", "Description": "Integration issues are solved once they appear, not anticipated", "Problem solving": "Scope Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 24, "Category": "Technical", "Description": "Absence of CI/CD - Ad-hoc script runs", "Problem solving": "Project Management\n", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P1" },
+            { "Sl.No": 25, "Category": "Customer Handling", "Description": "New CR Handling", "Problem solving": "Customer Handling\nScope Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "We need to have more trainings for this", "added by": null, "Priority": "P1" },
+            { "Sl.No": 26, "Category": "Customer Handling", "Description": "Alignment of changes / Acceptance of changes / Approval for changes", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer needs to understand the impact of cha...", "added by": null, "Priority": "P2" },
+            { "Sl.No": 27, "Category": "Customer Handling", "Description": "Customer Documentation", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 28, "Category": "Project/Program Management", "Description": "Customer is aware of delays in the project and yet follows up on things to be delivered.", "Problem solving": "Expectation Management\nCustomer Handling", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 29, "Category": "Project/Program Management", "Description": "Customer Management", "Problem solving": "Expectation Management\nCustomer Handling", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 30, "Category": "Project/Program Management", "Description": "Following the old ways of doing things", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Not adaptive to new ideas and innovations", "added by": null, "Priority": "P1" },
+            { "Sl.No": 31, "Category": "Technical", "Description": "Inadequate data to support solution decisions, scoping, build, delivery", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer Data delayed", "added by": null, "Priority": "P1" },
+            { "Sl.No": 32, "Category": "Technical", "Description": "Solution was partially delivered with more expectations on compliance / behavior.", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 33, "Category": "Technical", "Description": "Business Change Management", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 34, "Category": "Technical", "Description": "Multiple touch points in business (Implementation Partner vs Solution Partner vs Customer vs Internal)", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Too many points of contact", "added by": null, "Priority": "P1" },
+            { "Sl.No": 35, "Category": "Technical", "Description": "Infrastructure issues", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer Data delayed", "added by": null, "Priority": "P1" },
+            { "Sl.No": 36, "Category": "Technical", "Description": "Test Data", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer Data delayed", "added by": null, "Priority": "P1" },
+            { "Sl.No": 37, "Category": "Project/Program Management", "Description": "Too many SMEs handling customer at each implementation level", "Problem solving": "Project Management\nCustomer Handling", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Too many points of contact", "added by": null, "Priority": "P1" },
+            { "Sl.No": 38, "Category": "Technical", "Description": "Customer Documentation", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P2" },
+            { "Sl.No": 39, "Category": "Project/Program Management", "Description": "Lack of Coordination between customer and vendor partners", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 40, "Category": "Technical", "Description": "Scope Management", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 41, "Category": "Technical", "Description": "Unclear requirements at the beginning", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 42, "Category": "Customer Handling", "Description": "Too many instances of delivery promises", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": null, "added by": null, "Priority": "P1" },
+            { "Sl.No": 43, "Category": "Project/Program Management", "Description": "Customer communication missing", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 44, "Category": "Customer Handling", "Description": "Lack of Customer Meetings", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 45, "Category": "Project/Program Management", "Description": "Customer Management", "Problem solving": "Customer Handling\nExpectation Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 46, "Category": "Technical", "Description": "Lack of in-time Handover and management", "Problem solving": "Project Management\nRisk Management", "Contributed By": "Subramanya C R", "Voted/Seconded By": null, "Remarks/Additional Points": "Customer expectations were high", "added by": null, "Priority": "P1" },
+            { "Sl.No": 47, "Category": "Customer Handling", "Description": "Inconsistent feedback mechanism", "Problem solving": "Feedback Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Establish a consistent feedback mechanism", "added by": "Alice", "Priority": "P2" },
+            { "Sl.No": 48, "Category": "Customer Handling", "Description": "Customer satisfaction not measured regularly", "Problem solving": "Customer Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Regular customer satisfaction surveys", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 49, "Category": "Technical", "Description": "Integration issues between modules", "Problem solving": "Technical Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Improve integration processes", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 50, "Category": "Technical", "Description": "Obsolete technology in use", "Problem solving": "Technology Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Upgrade technology stack", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 51, "Category": "Project Management", "Description": "Lack of stakeholder engagement", "Problem solving": "Stakeholder Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Enhance stakeholder engagement", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 52, "Category": "Technical", "Description": "Poor data management practices", "Problem solving": "Data Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Improve data management practices", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 53, "Category": "Customer Handling", "Description": "Inconsistent service levels", "Problem solving": "Service Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Ensure consistent service levels", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 54, "Category": "Customer Handling", "Description": "Lack of customer focus", "Problem solving": "Customer Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Improve customer focus", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 55, "Category": "Project Management", "Description": "Project delays due to resource unavailability", "Problem solving": "Resource Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Ensure resource availability", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 56, "Category": "Technical", "Description": "Security vulnerabilities", "Problem solving": "Security Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Address security vulnerabilities", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 57, "Category": "Technical", "Description": "High defect rate in production", "Problem solving": "Quality Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Improve quality control processes", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 58, "Category": "Customer Handling", "Description": "Lack of transparency with customers", "Problem solving": "Transparency Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Enhance transparency with customers", "added by": "Alice", "Priority": "P2" },
+            { "Sl.No": 59, "Category": "Project Management", "Description": "Inefficient resource allocation", "Problem solving": "Resource Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Optimize resource allocation", "added by": "Alice", "Priority": "P2" },
+            { "Sl.No": 60, "Category": "Technical", "Description": "Lack of automated testing", "Problem solving": "Automation Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Implement automated testing", "added by": "Alice", "Priority": "P2" },
+            { "Sl.No": 61, "Category": "Technical", "Description": "Inconsistent coding standards", "Problem solving": "Standardization Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Enforce coding standards", "added by": "Alice", "Priority": "P2" },
+            { "Sl.No": 62, "Category": "Project Management", "Description": "Lack of clear project objectives", "Problem solving": "Objective Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Define clear project objectives", "added by": "Alice", "Priority": "P2" },
+            { "Sl.No": 63, "Category": "Customer Handling", "Description": "Failure to meet customer deadlines", "Problem solving": "Deadline Management", "Contributed By": "John Doe", "Voted/Seconded By": "Jane Smith", "Remarks/Additional Points": "Meet customer deadlines", "added by": "Alice", "Priority": "P1" },
+            { "Sl.No": 64, "Category": "Technical", "Description": "Final row description", "Problem solving": "Technical Management", "Contributed By": "Contributor Name", "Voted/Seconded By": "Voter Name", "Remarks/Additional Points": "Final row remarks", "added by": "Final Adder", "Priority": "P3" }
+            
+        ];
+
+        function populateCategories() {
+            const categories = [...new Set(data.map(item => item.Category))];
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryDropdown.appendChild(option);
+            });
+        }
+
+        function populateTable(filteredData) {
+            const dataTableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            dataTableBody.innerHTML = '';
+            filteredData.forEach(item => {
+                const row = dataTableBody.insertRow();
+                Object.values(item).forEach(text => {
+                    const cell = row.insertCell();
+                    cell.textContent = text !== null ? text : '';
+                });
+            });
+        }
+
+        function filterData() {
+            const selectedCategory = document.getElementById('categoryDropdown').value;
+            const filteredData = selectedCategory === 'All' ? data : data.filter(item => item.Category === selectedCategory);
+            populateTable(filteredData);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populateCategories();
+            filterData();
+        });
+    </script>
+</body>
+</html>
