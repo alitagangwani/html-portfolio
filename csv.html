@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <input type="file" id="csvFileInput" accept=".csv" />
+    <button onclick="loadCSV()">Load CSV</button>
+    <table id="csvTable">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // Function to load CSV file and store it in local storage
+        function loadCSV() {
+            const input = document.getElementById('csvFileInput');
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const csvData = event.target.result;
+                localStorage.setItem('csvData', csvData);
+                displayCSV(csvData);
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Function to display CSV data in a table
+        function displayCSV(csvData) {
+            const rows = csvData.split('\n');
+            const table = document.getElementById('csvTable');
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+
+            // Clear existing table content
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            // Parse CSV data and create table
+            rows.forEach((row, rowIndex) => {
+                const cols = row.split(',');
+
+                if (rowIndex === 0) {
+                    // Create table header
+                    const tr = document.createElement('tr');
+                    cols.forEach(col => {
+                        const th = document.createElement('th');
+                        th.textContent = col.trim();
+                        tr.appendChild(th);
+                    });
+                    thead.appendChild(tr);
+                } else {
+                    // Create table rows
+                    const tr = document.createElement('tr');
+                    cols.forEach(col => {
+                        const td = document.createElement('td');
+                        td.textContent = col.trim();
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                }
+            });
+        }
+
+        // Check if there's data in local storage and display it
+        window.onload = function() {
+            const storedCSV = localStorage.getItem('csvData');
+            if (storedCSV) {
+                displayCSV(storedCSV);
+            }
+        };
+    </script>
+</body>
+</html>
